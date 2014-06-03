@@ -23,6 +23,7 @@ var FromOptionsTransformer = traceur.codegeneration.FromOptionsTransformer;
 var Parser = traceur.syntax.Parser;
 var SourceFile = traceur.syntax.SourceFile;
 var TreeWriter = traceur.outputgeneration.TreeWriter;
+var SourceMapGenerator = traceur.outputgeneration.SourceMapGenerator;
 
 var ext = '.traceur-compiled';
 
@@ -40,10 +41,12 @@ function compile(filename) {
   var tree = parser.parseModule();
   var reporter = new ErrorReporter();
   var transformer = new FromOptionsTransformer(reporter);
+  var sourceMapGenerator = new SourceMapGenerator({file: filename});
+  var options = {sourceMapGenerator: sourceMapGenerator};
   tree = transformer.transform(tree);
   if (reporter.hadError())
     throw new Error('Error transforming ' + filename);
-  return TreeWriter.write(tree);
+  return TreeWriter.write(tree, options);
 }
 
 function traceurRequire(filename) {
